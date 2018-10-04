@@ -1,5 +1,6 @@
 package net.corda.deterministic.data
 
+import net.corda.core.internal.DefaultSizedCacheFactory
 import net.corda.core.serialization.deserialize
 import net.corda.deterministic.verifier.LocalSerializationRule
 import net.corda.deterministic.verifier.TransactionVerificationRequest
@@ -13,11 +14,12 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.util.*
-import java.util.Calendar.*
+import java.util.Calendar.FEBRUARY
 import java.util.jar.JarOutputStream
 import java.util.zip.Deflater.NO_COMPRESSION
 import java.util.zip.ZipEntry
-import java.util.zip.ZipEntry.*
+import java.util.zip.ZipEntry.DEFLATED
+import java.util.zip.ZipEntry.STORED
 import kotlin.reflect.jvm.jvmName
 
 /**
@@ -48,7 +50,7 @@ class GenerateData {
 
     @Rule
     @JvmField
-    val testSerialization = LocalSerializationRule(GenerateData::class.jvmName)
+    val testSerialization = LocalSerializationRule(GenerateData::class.jvmName, DefaultSizedCacheFactory())
 
     @Before
     fun createTransactions() {

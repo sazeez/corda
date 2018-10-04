@@ -1,6 +1,7 @@
 package net.corda.nodeapi.internal.persistence
 
 import co.paralleluniverse.strands.Strand
+import net.corda.core.internal.NamedCacheFactory
 import net.corda.core.schemas.MappedSchema
 import net.corda.core.utilities.contextLogger
 import rx.Observable
@@ -51,6 +52,7 @@ class CordaPersistence(
         databaseConfig: DatabaseConfig,
         schemas: Set<MappedSchema>,
         val jdbcUrl: String,
+        cacheFactory: NamedCacheFactory,
         attributeConverters: Collection<AttributeConverter<*, *>> = emptySet()
 ) : Closeable {
     companion object {
@@ -60,7 +62,7 @@ class CordaPersistence(
     private val defaultIsolationLevel = databaseConfig.transactionIsolationLevel
     val hibernateConfig: HibernateConfiguration by lazy {
         transaction {
-            HibernateConfiguration(schemas, databaseConfig, attributeConverters, jdbcUrl)
+            HibernateConfiguration(schemas, databaseConfig, attributeConverters, jdbcUrl, cacheFactory)
         }
     }
     val entityManagerFactory get() = hibernateConfig.sessionFactoryForRegisteredSchemas

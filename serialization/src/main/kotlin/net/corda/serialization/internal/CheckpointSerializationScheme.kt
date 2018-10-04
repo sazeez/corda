@@ -1,19 +1,25 @@
 package net.corda.serialization.internal
 
+import net.corda.core.DeleteForDJVM
 import net.corda.core.KeepForDJVM
 import net.corda.core.crypto.SecureHash
-import net.corda.core.serialization.*
+import net.corda.core.internal.DefaultSizedCacheFactory
+import net.corda.core.internal.NamedCacheFactory
+import net.corda.core.serialization.ClassWhitelist
+import net.corda.core.serialization.EncodingWhitelist
+import net.corda.core.serialization.SerializationEncoding
 import net.corda.core.serialization.internal.CheckpointSerializationContext
 
 @KeepForDJVM
-data class CheckpointSerializationContextImpl @JvmOverloads constructor(
-                                                              override val deserializationClassLoader: ClassLoader,
-                                                              override val whitelist: ClassWhitelist,
-                                                              override val properties: Map<Any, Any>,
-                                                              override val objectReferencesEnabled: Boolean,
-                                                              override val encoding: SerializationEncoding?,
-                                                              override val encodingWhitelist: EncodingWhitelist = NullEncodingWhitelist) : CheckpointSerializationContext {
-    private val builder = AttachmentsClassLoaderBuilder(properties, deserializationClassLoader)
+data class CheckpointSerializationContextImpl @JvmOverloads @DeleteForDJVM constructor(
+        override val deserializationClassLoader: ClassLoader,
+        override val whitelist: ClassWhitelist,
+        override val properties: Map<Any, Any>,
+        override val objectReferencesEnabled: Boolean,
+        override val encoding: SerializationEncoding?,
+        override val encodingWhitelist: EncodingWhitelist = NullEncodingWhitelist,
+        private val cacheFactory: NamedCacheFactory = DefaultSizedCacheFactory()) : CheckpointSerializationContext {
+    private val builder = AttachmentsClassLoaderBuilder(properties, deserializationClassLoader, cacheFactory)
 
     /**
      * {@inheritDoc}

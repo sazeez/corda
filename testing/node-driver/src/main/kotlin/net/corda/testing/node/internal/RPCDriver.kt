@@ -9,6 +9,7 @@ import net.corda.core.context.AuthServiceId
 import net.corda.core.context.Trace
 import net.corda.core.crypto.random63BitValue
 import net.corda.core.identity.CordaX500Name
+import net.corda.core.internal.DefaultSizedCacheFactory
 import net.corda.core.internal.concurrent.doneFuture
 import net.corda.core.internal.concurrent.fork
 import net.corda.core.internal.concurrent.map
@@ -485,7 +486,8 @@ data class RPCDriverDSL(
                 locator,
                 rpcSecurityManager,
                 nodeLegalName,
-                configuration
+                configuration,
+                DefaultSizedCacheFactory()
         )
         driverDSL.shutdownManager.registerShutdown {
             rpcServer.close(queueDrainTimeout)

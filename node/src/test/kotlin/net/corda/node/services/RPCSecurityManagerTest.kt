@@ -2,6 +2,7 @@ package net.corda.node.services
 
 import net.corda.core.context.AuthServiceId
 import net.corda.core.flows.FlowLogic
+import net.corda.core.internal.DefaultSizedCacheFactory
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.node.internal.security.Password
 import net.corda.node.internal.security.RPCSecurityManagerImpl
@@ -134,7 +135,7 @@ class RPCSecurityManagerTest {
 
     private fun checkUserActions(permissions: Set<String>, permitted: Set<ArrayList<String>>) {
         val user = User(username = "user", password = "password", permissions = permissions)
-        val userRealms = RPCSecurityManagerImpl(SecurityConfiguration.AuthService.fromUsers(listOf(user)))
+        val userRealms = RPCSecurityManagerImpl(SecurityConfiguration.AuthService.fromUsers(listOf(user)), DefaultSizedCacheFactory())
         val disabled = allActions.filter { !permitted.contains(listOf(it)) }
         for (subject in listOf(
                 userRealms.authenticate("user", Password("password")),
