@@ -48,6 +48,7 @@ import net.corda.node.services.messaging.*
 import net.corda.node.services.rpc.ArtemisRpcBroker
 import net.corda.node.utilities.*
 import net.corda.nodeapi.internal.ArtemisMessagingComponent.Companion.INTERNAL_SHELL_USER
+import net.corda.nodeapi.internal.DEV_CERTIFICATES
 import net.corda.nodeapi.internal.ShutdownHook
 import net.corda.nodeapi.internal.addShutdownHook
 import net.corda.nodeapi.internal.bridging.BridgeControlListener
@@ -134,7 +135,8 @@ open class Node(configuration: NodeConfiguration,
         private val sameVmNodeCounter = AtomicInteger()
 
         private fun makeCordappLoader(configuration: NodeConfiguration, versionInfo: VersionInfo): CordappLoader {
-            return JarScanningCordappLoader.fromDirectories(configuration.cordappDirectories, versionInfo)
+            val blacklistedCordappSigners = if (configuration.devMode) DEV_CERTIFICATES else emptyList()
+            return JarScanningCordappLoader.fromDirectories(configuration.cordappDirectories, versionInfo, blacklistedCordappSigners)
         }
 
         // TODO: make this configurable.
