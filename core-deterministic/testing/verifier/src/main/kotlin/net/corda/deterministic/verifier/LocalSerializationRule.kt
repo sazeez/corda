@@ -1,11 +1,9 @@
 package net.corda.deterministic.verifier
 
-import net.corda.core.internal.NamedCacheFactory
 import net.corda.core.serialization.ClassWhitelist
-import net.corda.core.serialization.EncodingWhitelist
 import net.corda.core.serialization.SerializationContext
+import net.corda.core.serialization.SerializationContext.UseCase.P2P
 import net.corda.core.serialization.SerializationCustomSerializer
-import net.corda.core.serialization.SerializationEncoding
 import net.corda.core.serialization.internal.SerializationEnvironmentImpl
 import net.corda.core.serialization.internal._contextSerializationEnv
 import net.corda.serialization.internal.*
@@ -19,23 +17,20 @@ import org.junit.runners.model.Statement
 import kotlin.reflect.KClass
 import kotlin.reflect.jvm.jvmName
 
-class LocalSerializationRule(private val label: String, cacheFactory: NamedCacheFactory = object : NamedCacheFactory {}) : TestRule {
+class LocalSerializationRule(private val label: String) : TestRule {
     constructor(klass: KClass<*>) : this(klass.jvmName)
 
-    private val AMQP_P2P_CONTEXT = SerializationContextImpl(
-            amqpMagic,
-            LocalSerializationRule::class.java.classLoader,
-            GlobalTransientClassWhiteList(BuiltInExceptionsWhitelist()),
-            emptyMap(),
-            true,
-            SerializationContext.UseCase.P2P,
-            null,
-            object : EncodingWhitelist {
-                override fun acceptEncoding(encoding: SerializationEncoding) = false
-            },
-            false,
-            cacheFactory
-    )
+    private companion object {
+        private val AMQP_P2P_CONTEXT = SerializationContextImpl(
+                amqpMagic,
+                LocalSerializationRule::class.java.classLoader,
+                GlobalTransientClassWhiteList(BuiltInExceptionsWhitelist()),
+                emptyMap(),
+                true,
+                P2P,
+                null
+        )
+    }
 
     override fun apply(base: Statement, description: Description): Statement {
         return object : Statement() {
@@ -85,7 +80,7 @@ class LocalSerializationRule(private val label: String, cacheFactory: NamedCache
         }
 
         override fun canDeserializeVersion(magic: CordaSerializationMagic, target: SerializationContext.UseCase): Boolean {
-            return canDeserializeVersion(magic) && target == SerializationContext.UseCase.P2P
+            return canDeserializeVersion(magic) && target == P2P
         }
     }
 }

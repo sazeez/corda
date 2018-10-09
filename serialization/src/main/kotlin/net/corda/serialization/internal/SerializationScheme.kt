@@ -6,8 +6,6 @@ import net.corda.core.DeleteForDJVM
 import net.corda.core.KeepForDJVM
 import net.corda.core.contracts.Attachment
 import net.corda.core.crypto.SecureHash
-import net.corda.core.internal.DefaultSizedCacheFactory
-import net.corda.core.internal.NamedCacheFactory
 import net.corda.core.internal.copyBytes
 import net.corda.core.serialization.*
 import net.corda.core.utilities.ByteSequence
@@ -25,17 +23,16 @@ internal object NullEncodingWhitelist : EncodingWhitelist {
 }
 
 @KeepForDJVM
-data class SerializationContextImpl @JvmOverloads @DeleteForDJVM constructor(override val preferredSerializationVersion: SerializationMagic,
-                                                                             override val deserializationClassLoader: ClassLoader,
-                                                                             override val whitelist: ClassWhitelist,
-                                                                             override val properties: Map<Any, Any>,
-                                                                             override val objectReferencesEnabled: Boolean,
-                                                                             override val useCase: SerializationContext.UseCase,
-                                                                             override val encoding: SerializationEncoding?,
-                                                                             override val encodingWhitelist: EncodingWhitelist = NullEncodingWhitelist,
-                                                                             override val lenientCarpenterEnabled: Boolean = false,
-                                                                             private val cacheFactory: NamedCacheFactory = DefaultSizedCacheFactory()) : SerializationContext {
-    private val builder = AttachmentsClassLoaderBuilder(properties, deserializationClassLoader, cacheFactory)
+data class SerializationContextImpl @JvmOverloads constructor(override val preferredSerializationVersion: SerializationMagic,
+                                                              override val deserializationClassLoader: ClassLoader,
+                                                              override val whitelist: ClassWhitelist,
+                                                              override val properties: Map<Any, Any>,
+                                                              override val objectReferencesEnabled: Boolean,
+                                                              override val useCase: SerializationContext.UseCase,
+                                                              override val encoding: SerializationEncoding?,
+                                                              override val encodingWhitelist: EncodingWhitelist = NullEncodingWhitelist,
+                                                              override val lenientCarpenterEnabled: Boolean = false) : SerializationContext {
+    private val builder = AttachmentsClassLoaderBuilder(properties, deserializationClassLoader)
 
     /**
      * {@inheritDoc}
@@ -78,8 +75,8 @@ data class SerializationContextImpl @JvmOverloads @DeleteForDJVM constructor(ove
  * can replace it with an alternative version.
  */
 @DeleteForDJVM
-internal class AttachmentsClassLoaderBuilder(private val properties: Map<Any, Any>, private val deserializationClassLoader: ClassLoader, cacheFactory: NamedCacheFactory) {
-    private val cache: Cache<List<SecureHash>, AttachmentsClassLoader> = cacheFactory.buildNamed(Caffeine.newBuilder().weakValues(), "SerializationScheme_attachmentClassloader")
+internal class AttachmentsClassLoaderBuilder(private val properties: Map<Any, Any>, private val deserializationClassLoader: ClassLoader) {
+    private val cache: Cache<List<SecureHash>, AttachmentsClassLoader> = Caffeine.newBuilder().weakValues().maximumSize(1024).build()
 
     fun build(attachmentHashes: List<SecureHash>): AttachmentsClassLoader? {
         val serializationContext = properties[serializationContextKey] as? SerializeAsTokenContext ?: return null // Some tests don't set one.
