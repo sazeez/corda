@@ -30,6 +30,9 @@ interface NamedCacheFactory {
 
 private val allowedChars = Regex("^[0-9A-Za-z_.]*\$")
 
+/**
+ * Used in tests
+ */
 class DefaultSizedCacheFactory(private val defaultSize: Long = 1024) : NamedCacheFactory {
     override fun <K, V> buildNamed(caffeine: Caffeine<in K, in V>, name: String): Cache<K, V> {
         checkCacheName(name)

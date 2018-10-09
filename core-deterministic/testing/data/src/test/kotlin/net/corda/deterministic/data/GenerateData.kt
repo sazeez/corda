@@ -1,9 +1,9 @@
 package net.corda.deterministic.data
 
-import net.corda.core.internal.DefaultSizedCacheFactory
 import net.corda.core.serialization.deserialize
 import net.corda.deterministic.verifier.LocalSerializationRule
 import net.corda.deterministic.verifier.TransactionVerificationRequest
+import net.corda.testing.internal.TestingNamedCacheFactory
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,7 +50,7 @@ class GenerateData {
 
     @Rule
     @JvmField
-    val testSerialization = LocalSerializationRule(GenerateData::class.jvmName, DefaultSizedCacheFactory())
+    val testSerialization = LocalSerializationRule(GenerateData::class.jvmName, TestingNamedCacheFactory())
 
     @Before
     fun createTransactions() {

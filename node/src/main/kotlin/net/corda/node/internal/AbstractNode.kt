@@ -16,10 +16,13 @@ import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.identity.Party
 import net.corda.core.identity.PartyAndCertificate
-import net.corda.core.internal.*
+import net.corda.core.internal.FlowStateMachine
+import net.corda.core.internal.NamedCacheFactory
+import net.corda.core.internal.VisibleForTesting
 import net.corda.core.internal.concurrent.map
 import net.corda.core.internal.concurrent.openFuture
 import net.corda.core.internal.notary.NotaryService
+import net.corda.core.internal.uncheckedCast
 import net.corda.core.messaging.*
 import net.corda.core.node.*
 import net.corda.core.node.services.*
@@ -1027,19 +1030,6 @@ class FlowStarterImpl(private val smm: StateMachineManager, private val flowLogi
 }
 
 class ConfigurationException(message: String) : CordaException(message)
-
-// TODO This is no longer used by AbstractNode and can be moved elsewhere
-fun configureDatabase(hikariProperties: Properties,
-                      databaseConfig: DatabaseConfig,
-                      wellKnownPartyFromX500Name: (CordaX500Name) -> Party?,
-                      wellKnownPartyFromAnonymous: (AbstractParty) -> Party?,
-                      schemaService: SchemaService = NodeSchemaService(),
-                      internalSchemas: Set<MappedSchema> = NodeSchemaService().internalSchemas(),
-                      cacheFactory: NamedCacheFactory = DefaultSizedCacheFactory()): CordaPersistence {
-    val persistence = createCordaPersistence(databaseConfig, wellKnownPartyFromX500Name, wellKnownPartyFromAnonymous, schemaService, hikariProperties, cacheFactory)
-    persistence.startHikariPool(hikariProperties, databaseConfig, internalSchemas)
-    return persistence
-}
 
 fun createCordaPersistence(databaseConfig: DatabaseConfig,
                            wellKnownPartyFromX500Name: (CordaX500Name) -> Party?,

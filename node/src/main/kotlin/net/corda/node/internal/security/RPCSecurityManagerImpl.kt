@@ -4,8 +4,6 @@ package net.corda.node.internal.security
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.primitives.Ints
-import net.corda.core.context.AuthServiceId
-import net.corda.core.internal.DefaultSizedCacheFactory
 import net.corda.core.internal.NamedCacheFactory
 import net.corda.core.internal.uncheckedCast
 import net.corda.core.utilities.loggerFor
@@ -75,12 +73,6 @@ class RPCSecurityManagerImpl(config: AuthServiceConfig, cacheFactory: NamedCache
     companion object {
 
         private val logger = loggerFor<RPCSecurityManagerImpl>()
-
-        /**
-         * Instantiate RPCSecurityManager initialised with users data from a list of [User]
-         */
-        fun fromUserList(id: AuthServiceId, users: List<User>) =
-                RPCSecurityManagerImpl(AuthServiceConfig.fromUsers(users).copy(id = id), DefaultSizedCacheFactory())
 
         // Build internal Shiro securityManager instance
         private fun buildImpl(config: AuthServiceConfig, cacheFactory: NamedCacheFactory): DefaultSecurityManager {

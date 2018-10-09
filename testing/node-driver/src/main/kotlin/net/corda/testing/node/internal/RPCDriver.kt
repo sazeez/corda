@@ -9,7 +9,6 @@ import net.corda.core.context.AuthServiceId
 import net.corda.core.context.Trace
 import net.corda.core.crypto.random63BitValue
 import net.corda.core.identity.CordaX500Name
-import net.corda.core.internal.DefaultSizedCacheFactory
 import net.corda.core.internal.concurrent.doneFuture
 import net.corda.core.internal.concurrent.fork
 import net.corda.core.internal.concurrent.map
@@ -30,6 +29,8 @@ import net.corda.testing.core.MAX_MESSAGE_SIZE
 import net.corda.testing.driver.JmxPolicy
 import net.corda.testing.driver.PortAllocation
 import net.corda.testing.driver.TestCorDapp
+import net.corda.testing.internal.TestingNamedCacheFactory
+import net.corda.testing.internal.fromUserList
 import net.corda.testing.node.NotarySpec
 import net.corda.testing.node.User
 import net.corda.testing.node.internal.DriverDSLImpl.Companion.cordappsInCurrentAndAdditionalPackages
@@ -487,7 +488,7 @@ data class RPCDriverDSL(
                 rpcSecurityManager,
                 nodeLegalName,
                 configuration,
-                DefaultSizedCacheFactory()
+                TestingNamedCacheFactory()
         )
         driverDSL.shutdownManager.registerShutdown {
             rpcServer.close(queueDrainTimeout)

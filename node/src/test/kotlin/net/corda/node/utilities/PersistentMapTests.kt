@@ -1,10 +1,10 @@
 package net.corda.node.utilities
 
 import net.corda.core.crypto.SecureHash
-import net.corda.core.internal.DefaultSizedCacheFactory
-import net.corda.node.internal.configureDatabase
 import net.corda.node.services.upgrade.ContractUpgradeServiceImpl
 import net.corda.nodeapi.internal.persistence.DatabaseConfig
+import net.corda.testing.internal.TestingNamedCacheFactory
+import net.corda.testing.internal.configureDatabase
 import net.corda.testing.node.MockServices
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -27,7 +27,7 @@ class PersistentMapTests {
                     }
                 },
                 persistentEntityClass = ContractUpgradeServiceImpl.DBContractUpgrade::class.java,
-                cacheFactory = DefaultSizedCacheFactory()
+                cacheFactory = TestingNamedCacheFactory()
         ).apply { preload() }
     }
 
